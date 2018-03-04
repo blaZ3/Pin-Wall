@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.MainThread;
 import android.text.TextUtils;
 import android.widget.ImageView;
 
@@ -72,7 +71,7 @@ public class Downloader {
         public void handleMessage(Message msg) {
             switch (msg.what){
                 case SHOW_IMAGE:
-                    DownloaderMainAction mainAction = (DownloaderMainAction)msg.obj;
+                    DownloaderMessage mainAction = (DownloaderMessage)msg.obj;
                     if (mainAction.request.getTag() instanceof ImageView){
                         ((ImageView)mainAction.request.getTag()).setImageBitmap(
                                 ((DownloadAction.ImageDownloadAction)mainAction.action).getBitmap());
@@ -86,12 +85,11 @@ public class Downloader {
         }
     };
 
-    static class DownloaderMainAction{
+    static class DownloaderMessage {
         public Request request;
         public DownloadAction action;
-        public RequestInterface callback;
 
-        public DownloaderMainAction(Request request, DownloadAction action) {
+        public DownloaderMessage(Request request, DownloadAction action) {
             this.request = request;
             this.action = action;
         }

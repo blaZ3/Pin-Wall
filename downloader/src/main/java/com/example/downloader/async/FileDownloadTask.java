@@ -40,7 +40,6 @@ public class FileDownloadTask implements DownloaderTask{
                         retrofit2.Response<ResponseBody> response = NetworkClient.
                                 getNetworkService().downloadFileUrl(url).execute();
 
-
                         String filePath = fileHelper.getFilePathForUrl(url);
                         fileHelper.writeResponseBodyToDisk(response.body(), filePath);
 
@@ -64,4 +63,11 @@ public class FileDownloadTask implements DownloaderTask{
         };
     }
 
+
+    @Override
+    public String toString() {
+        return "FileDownloadTask{" +
+                "url='" + url + '\'' +
+                '}';
+    }
 }

@@ -9,13 +9,11 @@ import android.os.Process;
 import android.util.Log;
 
 import com.example.downloader.async.DownloadAction;
+import com.example.downloader.async.DownloaderTask;
 import com.example.downloader.async.FileDownloadTask;
 import com.example.downloader.async.ThreadPoolExecutorHelper;
 import com.example.downloader.models.Request;
-import com.example.downloader.models.RequestInterface;
 
-
-import org.bouncycastle.ocsp.Req;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +40,7 @@ public class DownloadManager {
 
     private ThreadPoolExecutorHelper threadPoolExecutorHelper;
     private HashMap<Object, Request> currentRequests = new HashMap<>();
+    private HashMap<String, DownloaderTask> currentTasks = new HashMap<>();
 
 
     public static final int FILE_DOWNLOAD_SUCCESS = 1001;
@@ -93,17 +92,16 @@ public class DownloadManager {
 
                                     Message message = Downloader.MAIN_HANDLER.obtainMessage();
                                     message.what = Downloader.SHOW_IMAGE;
-                                    message.obj = new Downloader.DownloaderMainAction(request, action);
+                                    message.obj = new Downloader.DownloaderMessage(request, action);
                                     Downloader.MAIN_HANDLER.sendMessage(message);
-
-//                                    ((RequestInterface.ImageInterface)request.getCallback())
-//                                            .gotImage(((DownloadAction.ImageDownloadAction)action).getBitmap());
 
                                 }else if (action.getType().equals(DownloadAction.Type.JSON)){
 
                                 }else if (action.getType().equals(DownloadAction.Type.FILE)){
 
                                 }
+
+                                currentTasks.remove(request.getUrl());
                             }
                         }
 
@@ -126,9 +124,20 @@ public class DownloadManager {
         //check if the request is already in process
         if (currentRequests.containsKey(request.getTag())){
             //if tag already exists dont do anything
+            Log.d(TAG, "submitAndEnqueue: duplicate request tag:"+request.getTag()+" already queued");
         }else {
-            request.setFuture(threadPoolExecutorHelper.addTask(
-                    new FileDownloadTask(request.getUrl(), FileHelper.getInstance())));
+            Log.d(TAG, "submitAndEnqueue: adding request to queue:"+request.getTag());
+            if (!currentTasks.containsKey(request.getUrl())){
+                FileDownloadTask fileDownloadTask = new FileDownloadTask(request.getUrl(), FileHelper.getInstance());
+                request.setFuture(threadPoolExecutorHelper.addTask(fileDownloadTask));
+                synchronized (currentTasks){
+                    Log.d(TAG, "submitAndEnqueue: adding task to queue"+request.getUrl());
+                    currentTasks.put(Utils.getMD5Hash(request.getUrl()), fileDownloadTask);
+                    currentTasks.notifyAll();
+                }
+            }else {
+                Log.d(TAG, "submitAndEnqueue: url already in queue");
+            }
             synchronized (currentRequests){
                 currentRequests.put(request.getTag(), request);
                 currentRequests.notifyAll();

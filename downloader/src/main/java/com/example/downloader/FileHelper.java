@@ -8,8 +8,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import okhttp3.ResponseBody;
 
@@ -48,22 +51,22 @@ public class FileHelper {
         }
     }
 
-    public File getFile(String url){
-        String filePath = getFilePathForUrl(url);
-        File file = new File(filePath);
-
-        if (file.exists()){
-            return file;
-        }else {
-            return null;
-        }
-    }
+//    public File getFile(String url){
+//        String filePath = getFilePathForUrl(url);
+//        File file = new File(filePath);
+//
+//        if (file.exists()){
+//            return file;
+//        }else {
+//            return null;
+//        }
+//    }
 
     public String getFilePathForUrl(String url) {
         try {
-            String name = new File(new URL(url).getPath()).getName();
+            String name = Utils.getMD5Hash(url);
             return getFilePathForName(name);
-        } catch (MalformedURLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         throw new IllegalArgumentException("Url is not valid");

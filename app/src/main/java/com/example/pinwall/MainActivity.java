@@ -28,8 +28,16 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Downloader.with(MainActivity.this)
                         .download("https://source.android.com/_static/images/android/touchicon-180.png")
-                        .setTag(dataBinding.imgTest)
+                        .setTag(dataBinding.imgTest1)
                         .start();
+
+                Downloader.with(MainActivity.this)
+                        .download("https://source.android.com/_static/images/android/touchicon-180.png")
+                        .setTag(TAG)
+                        .setTag(dataBinding.imgTest2)
+                        .start();
+
+
 
 
                     //        Downloader.with(this)
@@ -45,21 +53,4 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
-    RequestInterface.ImageInterface imageInterface = new RequestInterface.ImageInterface() {
-        @Override
-        public void gotImage(final Bitmap bitmap) {
-            dataBinding.imgTest.post(new Runnable() {
-                @Override
-                public void run() {
-                    dataBinding.imgTest.setImageBitmap(bitmap);
-                }
-            });
-        }
-
-        @Override
-        public void onError(Exception ex) {
-
-        }
-    };
 }
