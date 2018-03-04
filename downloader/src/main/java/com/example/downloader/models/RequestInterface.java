@@ -2,6 +2,7 @@ package com.example.downloader.models;
 
 import android.graphics.Bitmap;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.File;
@@ -18,7 +19,7 @@ public interface RequestInterface {
     }
 
     interface JsonInterface extends RequestInterface{
-        void gotJson(JsonObject jsonObject);
+        void gotJson(JsonElement jsonElement);
     }
 
     interface FileInterface extends RequestInterface{

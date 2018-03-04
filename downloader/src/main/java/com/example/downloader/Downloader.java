@@ -65,21 +65,38 @@ public class Downloader {
     }
 
 
-    static final int SHOW_IMAGE = 2001;
+    static final int GOT_IMAGE = 2001;
+    static final int GOT_JSON = 2002;
+    static final int GOT_FILE = 2003;
+    static final int ERROR = 2020;
     static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper()){
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what){
-                case SHOW_IMAGE:
-                    DownloaderMessage mainAction = (DownloaderMessage)msg.obj;
-                    if (mainAction.request.getTag() instanceof ImageView){
-                        ((ImageView)mainAction.request.getTag()).setImageBitmap(
-                                ((DownloadAction.ImageDownloadAction)mainAction.action).getBitmap());
+                case GOT_IMAGE:
+                    DownloaderMessage imgAction = (DownloaderMessage)msg.obj;
+                    if (imgAction.request.getTag() instanceof ImageView){
+                        ((ImageView)imgAction.request.getTag()).setImageBitmap(
+                                ((DownloadAction.ImageDownloadAction)imgAction.action).getBitmap());
                     }else {
-                        ((RequestInterface.ImageInterface)mainAction.request.getCallback())
-                                .gotImage(((DownloadAction.ImageDownloadAction)
-                                        mainAction.action).getBitmap());
+                        RequestInterface.ImageInterface imageCallback = ((RequestInterface.ImageInterface)imgAction.request.getCallback());
+                        imageCallback.gotImage(((DownloadAction.ImageDownloadAction)imgAction.action).getBitmap());
                     }
+                    break;
+                case GOT_JSON:
+                    DownloaderMessage jsonAction = (DownloaderMessage)msg.obj;
+                    RequestInterface.JsonInterface imageCallback = (RequestInterface.JsonInterface)jsonAction.request.getCallback();
+                    imageCallback.gotJson(((DownloadAction.JsonDownloadAction)jsonAction.action).getJsonElement());
+                    break;
+                case GOT_FILE:
+                    DownloaderMessage fileAction = (DownloaderMessage) msg.obj;
+                    RequestInterface.FileInterface fileCallback = (RequestInterface.FileInterface) fileAction.request.getCallback();
+                    fileCallback.gotFile(((DownloadAction.FileDownloadAction)fileAction.action).getFile());
+                    break;
+                case ERROR:
+                    DownloaderMessage errorAction = (DownloaderMessage) msg.obj;
+                    errorAction.request.getCallback()
+                            .onError(new Exception("Error while fetching url:" + errorAction.request.getUrl()));
                     break;
             }
         }

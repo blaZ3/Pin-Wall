@@ -88,18 +88,18 @@ public class DownloadManager {
 
                             if (request.getUrl().equals(action.getUrl())){
                                 tags.add(request.getTag());
+
+                                Message message = Downloader.MAIN_HANDLER.obtainMessage();
                                 if (action.getType().equals(DownloadAction.Type.IMAGE)){
-
-                                    Message message = Downloader.MAIN_HANDLER.obtainMessage();
-                                    message.what = Downloader.SHOW_IMAGE;
-                                    message.obj = new Downloader.DownloaderMessage(request, action);
-                                    Downloader.MAIN_HANDLER.sendMessage(message);
-
+                                    message.what = Downloader.GOT_IMAGE;
                                 }else if (action.getType().equals(DownloadAction.Type.JSON)){
-
-                                }else if (action.getType().equals(DownloadAction.Type.FILE)){
-
+                                    message.what = Downloader.GOT_JSON;
+                                }else {
+                                    message.what = Downloader.GOT_FILE;
                                 }
+
+                                message.obj = new Downloader.DownloaderMessage(request, action);
+                                Downloader.MAIN_HANDLER.sendMessage(message);
 
                                 currentTasks.remove(request.getUrl());
                             }
@@ -114,6 +114,9 @@ public class DownloadManager {
 
                     break;
                 case FILE_DOWNLOAD_FAILED:
+                    Message message = Downloader.MAIN_HANDLER.obtainMessage();
+                    message.what = Downloader.ERROR;
+                    Downloader.MAIN_HANDLER.sendMessage(message);
                     break;
             }
         }
