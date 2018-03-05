@@ -56,7 +56,7 @@ public class PinsPresenter {
             public void onError(Exception ex) {
                 screen.hideRefreshing();
                 screen.hideLoading();
-                screen.showNetworkError();
+                screen.showError();
             }
         });
     }
