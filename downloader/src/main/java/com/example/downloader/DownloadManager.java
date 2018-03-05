@@ -108,6 +108,8 @@ public class DownloadManager {
                                             ((DownloadAction.JsonDownloadAction)action).getJsonElement());
                                 }else if (action.getType().equals(DownloadAction.Type.STRING)){
                                     message.what = Downloader.GOT_STRING;
+                                    localCache.putValueToCache(request.getUrl(),
+                                            ((DownloadAction.StringDownloadAction)action).getString());
                                 }else{
                                     message.what = Downloader.GOT_FILE;
                                 }
@@ -157,6 +159,14 @@ public class DownloadManager {
                 Downloader.DownloaderMessage downloaderMessage = new Downloader
                         .DownloaderMessage(request,
                         new DownloadAction.JsonDownloadAction(request.getUrl(), (JsonElement) cacheValue));
+                message.obj = downloaderMessage;
+                Downloader.MAIN_HANDLER.sendMessage(message);
+            }else if (cacheValue instanceof String){
+                Message message = Downloader.MAIN_HANDLER.obtainMessage();
+                message.what = Downloader.GOT_STRING;
+                Downloader.DownloaderMessage downloaderMessage = new Downloader
+                        .DownloaderMessage(request,
+                        new DownloadAction.StringDownloadAction(request.getUrl(), (String) cacheValue, true));
                 message.obj = downloaderMessage;
                 Downloader.MAIN_HANDLER.sendMessage(message);
             }else {

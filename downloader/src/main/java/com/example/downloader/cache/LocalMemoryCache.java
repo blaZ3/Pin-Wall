@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 import android.util.LruCache;
 
+import com.example.downloader.async.DownloadAction;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -44,6 +45,8 @@ public class LocalMemoryCache implements LocalCache {
                     if (obj instanceof Bitmap){
                         return ((Bitmap)obj).getByteCount() / 1024;
                     }else if (obj instanceof JsonElement){
+                        return obj.toString().getBytes().length / 1024;
+                    }else if (obj instanceof String){
                         return obj.toString().getBytes().length / 1024;
                     }
                 }catch (Exception ex){

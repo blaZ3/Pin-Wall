@@ -52,6 +52,13 @@ public interface DownloadAction {
             if (bitmap == null && filePath!=null){
                 bitmap = BitmapFactory.decodeFile(filePath);
             }
+
+            try{
+                new File(filePath).delete();
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+
             return bitmap;
         }
 
@@ -94,6 +101,13 @@ public interface DownloadAction {
                     jsonElement = null;
                 }
             }
+
+            try{
+                new File(filePath).delete();
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+
             return jsonElement;
         }
 
@@ -137,31 +151,51 @@ public interface DownloadAction {
 
         private String url;
         private String filePath;
+        private String strValue;
 
-        public StringDownloadAction(String url, String filePath){
+        public StringDownloadAction(String url, String value, boolean isString){
             this.url = url;
-            this.filePath = filePath;
+            if (isString){
+                this.strValue = value;
+                this.filePath = null;
+            }else {
+                this.strValue = null;
+                this.filePath = value;
+            }
+
         }
 
         public String getString(){
-            FileInputStream fin = null;
-            try  {
-                File fl = new File(filePath);
-                fin = new FileInputStream(fl);
-                String ret = convertStreamToString(fin);
-                return ret;
-            }catch (Exception ex){
-                return null;
-            }finally {
-                //Make sure you close all streams.
-                if (fin!=null){
-                    try {
-                        fin.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+            if (strValue == null && filePath!=null){
+                FileInputStream fin = null;
+                File file = null;
+                try  {
+                    file = new File(filePath);
+                    fin = new FileInputStream(file);
+                    strValue = convertStreamToString(fin);
+                }catch (Exception ex){
+                    strValue = null;
+                }finally {
+                    //Make sure you close all streams.
+                    if (fin!=null){
+                        try {
+                            fin.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    if (file != null){
+                        try{
+                            file.delete();
+                        }catch (Exception ex){
+                            ex.printStackTrace();
+                        }
                     }
                 }
             }
+
+            return strValue;
         }
 
         String convertStreamToString(InputStream is) throws Exception {

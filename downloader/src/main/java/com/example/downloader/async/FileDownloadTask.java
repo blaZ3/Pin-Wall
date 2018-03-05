@@ -58,7 +58,7 @@ public class FileDownloadTask implements DownloaderTask{
                             }else if (mediaType.toString().contains("json")){
                                 message.obj = new DownloadAction.JsonDownloadAction(url, filePath);
                             }else if (mediaType.toString().contains("text")){
-                                message.obj = new DownloadAction.StringDownloadAction(url, filePath);
+                                message.obj = new DownloadAction.StringDownloadAction(url, filePath, false);
                             }else{
                                 message.obj = new DownloadAction.FileDownloadAction(url, filePath);
                             }
