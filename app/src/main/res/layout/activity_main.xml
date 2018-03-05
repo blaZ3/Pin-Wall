@@ -3,65 +3,52 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:gravity="center_horizontal"
         tools:context="com.example.pinwall.MainActivity">
 
-        <Button
-            android:id="@+id/bnt_test"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:text="Button"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <ProgressBar
+            android:id="@+id/progress_main"
+            android:layout_gravity="center"
+            android:visibility="visible"
+            android:layout_width="64dp"
+            android:layout_height="64dp"/>
 
-
-        <LinearLayout
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/pull_refresh_main"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:visibility="gone"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:refreshing="false">
 
-            <ImageView
-                android:id="@+id/img_test1"
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_main"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/bnt_test"
-                app:srcCompat="@android:drawable/btn_star" />
+                android:background="@color/background"/>
 
+        </android.support.v4.widget.SwipeRefreshLayout>
 
-            <ImageView
-                android:id="@+id/img_test2"
+        <LinearLayout
+            android:id="@+id/layout_retry"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:gravity="center"
+            android:padding="16dp"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btn_retry"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="5dp"
-                android:scaleType="centerCrop"
-                android:layout_weight="1"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/bnt_test"
-                app:srcCompat="@android:drawable/btn_star" />
-
-
-
+                android:layout_height="wrap_content"
+                android:text="Retry"/>
 
         </LinearLayout>
 
-
-
-    </LinearLayout>
+    </FrameLayout>
 
 </layout>

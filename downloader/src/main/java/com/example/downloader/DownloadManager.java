@@ -42,6 +42,7 @@ public class DownloadManager {
     public static Handler HANDLER;
 
     private ThreadPoolExecutorHelper threadPoolExecutorHelper;
+
     private HashMap<Object, Request> currentRequests = new HashMap<>();
     private HashMap<String, DownloaderTask> currentTasks = new HashMap<>();
 
@@ -80,10 +81,13 @@ public class DownloadManager {
 
         @Override
         public void handleMessage(Message msg) {
+            DownloadAction action = null;
+            if (msg.obj instanceof DownloadAction){
+                action = (DownloadAction) msg.obj;
+            }
+
             switch (msg.what){
                 case FILE_DOWNLOAD_SUCCESS:
-                    DownloadAction action = (DownloadAction) msg.obj;
-
                     synchronized (currentRequests){
                         ArrayList<Object> tags = new ArrayList<>();
 
@@ -130,9 +134,34 @@ public class DownloadManager {
 
                     break;
                 case FILE_DOWNLOAD_FAILED:
-                    Message message = Downloader.MAIN_HANDLER.obtainMessage();
-                    message.what = Downloader.ERROR;
-                    Downloader.MAIN_HANDLER.sendMessage(message);
+                    synchronized (currentRequests){
+                        ArrayList<Object> tags = new ArrayList<>();
+                        ArrayList<String> urls = new ArrayList<>();
+
+                        for (Request request: currentRequests.values()){
+                            if (request.getUrl().equals((String) msg.obj)){
+
+                                tags.add(request.getTag());
+                                urls.add(request.getUrl());
+
+                                Message message = Downloader.MAIN_HANDLER.obtainMessage();
+                                message.what = Downloader.ERROR;
+                                message.obj = new Downloader.DownloaderMessage(request, action);
+                                Downloader.MAIN_HANDLER.sendMessage(message);
+                            }
+
+                        }
+
+                        for (Object tag:tags){
+                            currentRequests.remove(tag);
+                        }
+
+                        for (String url:urls){
+                            currentTasks.remove(url);
+                        }
+
+                        currentRequests.notifyAll();
+                    }
                     break;
             }
         }

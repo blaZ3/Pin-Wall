@@ -94,8 +94,10 @@ public class Downloader {
                     break;
                 case ERROR:
                     DownloaderMessage errorAction = (DownloaderMessage) msg.obj;
-                    errorAction.request.getCallback()
-                            .onError(new Exception("Error while fetching url:" + errorAction.request.getUrl()));
+                    if (errorAction != null && errorAction.request.getCallback()!=null){
+                        errorAction.request.getCallback()
+                                .onError(new Exception("Error while fetching url:" + errorAction.request.getUrl()));
+                    }
                     break;
             }
         }
