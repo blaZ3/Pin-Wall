@@ -94,7 +94,9 @@ public class DownloadManager {
                                     message.what = Downloader.GOT_IMAGE;
                                 }else if (action.getType().equals(DownloadAction.Type.JSON)){
                                     message.what = Downloader.GOT_JSON;
-                                }else {
+                                }else if (action.getType().equals(DownloadAction.Type.STRING)){
+                                    message.what = Downloader.GOT_STRING;
+                                }else{
                                     message.what = Downloader.GOT_FILE;
                                 }
 

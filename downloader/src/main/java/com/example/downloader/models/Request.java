@@ -1,5 +1,7 @@
 package com.example.downloader.models;
 
+import android.text.TextUtils;
+
 import com.example.downloader.Downloader;
 
 import java.util.concurrent.Future;
@@ -71,9 +73,12 @@ public final class Request {
         }
 
         public void start(){
-            if (tag == null){
-                throw new IllegalArgumentException("tag cannot be empty");
+            if (TextUtils.isEmpty(url)){
+                throw new IllegalArgumentException("Url cannot be null or empty");
             }else {
+                if (tag == null){
+                    tag = url;
+                }
                 Request request = new Request(url, tag, null, callback);
                 downloader.submit(request);
             }

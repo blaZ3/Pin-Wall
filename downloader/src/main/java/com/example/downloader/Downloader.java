@@ -68,6 +68,7 @@ public class Downloader {
     static final int GOT_IMAGE = 2001;
     static final int GOT_JSON = 2002;
     static final int GOT_FILE = 2003;
+    static final int GOT_STRING = 2004;
     static final int ERROR = 2020;
     static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper()){
         @Override
@@ -92,6 +93,11 @@ public class Downloader {
                     DownloaderMessage fileAction = (DownloaderMessage) msg.obj;
                     RequestInterface.FileInterface fileCallback = (RequestInterface.FileInterface) fileAction.request.getCallback();
                     fileCallback.gotFile(((DownloadAction.FileDownloadAction)fileAction.action).getFile());
+                    break;
+                case GOT_STRING:
+                    DownloaderMessage stringAction = (DownloaderMessage) msg.obj;
+                    RequestInterface.StringInterface stringCallback = (RequestInterface.StringInterface) stringAction.request.getCallback();
+                    stringCallback.gotString(((DownloadAction.StringDownloadAction)stringAction.action).getString());
                     break;
                 case ERROR:
                     DownloaderMessage errorAction = (DownloaderMessage) msg.obj;

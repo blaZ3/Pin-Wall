@@ -26,6 +26,9 @@ public interface RequestInterface {
         void gotFile(File file);
     }
 
+    interface StringInterface extends RequestInterface{
+        void gotString(String string);
+    }
 
     void onError(Exception ex);
 }

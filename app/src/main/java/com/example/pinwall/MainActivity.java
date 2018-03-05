@@ -36,17 +36,16 @@ public class MainActivity extends AppCompatActivity {
                         .start();
 
                 Downloader.with(MainActivity.this)
-                        .download("https://jsonplaceholder.typicode.com/posts/1")
-                        .setTag(TAG+"json")
-                        .setCallback(new RequestInterface.JsonInterface() {
+                        .download("http://pastebin.com/raw/wgkJgazE")
+                        .setCallback(new RequestInterface.StringInterface() {
                             @Override
-                            public void gotJson(JsonElement jsonElement) {
-                                Log.d(TAG, "gotJson: "+jsonElement);
+                            public void gotString(String string) {
+                                Log.d(TAG, "gotString() called with: string = [" + string + "]");
                             }
 
                             @Override
                             public void onError(Exception ex) {
-
+                                Log.d(TAG, "onError() called with: ex = [" + ex + "]");
                             }
                         })
                         .start();
