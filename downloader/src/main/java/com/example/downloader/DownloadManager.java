@@ -1,6 +1,7 @@
 package com.example.downloader;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -12,7 +13,9 @@ import com.example.downloader.async.DownloadAction;
 import com.example.downloader.async.DownloaderTask;
 import com.example.downloader.async.FileDownloadTask;
 import com.example.downloader.async.ThreadPoolExecutorHelper;
+import com.example.downloader.cache.LocalCache;
 import com.example.downloader.models.Request;
+import com.google.gson.JsonElement;
 
 
 import java.util.ArrayList;
@@ -42,11 +45,14 @@ public class DownloadManager {
     private HashMap<Object, Request> currentRequests = new HashMap<>();
     private HashMap<String, DownloaderTask> currentTasks = new HashMap<>();
 
+    private LocalCache localCache;
 
     public static final int FILE_DOWNLOAD_SUCCESS = 1001;
     public static final int FILE_DOWNLOAD_FAILED = 1002;
 
-    public DownloadManager(Context context) {
+    public DownloadManager(LocalCache localCache) {
+        this.localCache = localCache;
+
         downloadManagerThread = new DownloadManagerThread();
         downloadManagerThread.start();
 
@@ -92,8 +98,14 @@ public class DownloadManager {
                                 Message message = Downloader.MAIN_HANDLER.obtainMessage();
                                 if (action.getType().equals(DownloadAction.Type.IMAGE)){
                                     message.what = Downloader.GOT_IMAGE;
+                                    //add to cache
+                                    localCache.putValueToCache(request.getUrl(),
+                                            ((DownloadAction.ImageDownloadAction)action).getBitmap());
                                 }else if (action.getType().equals(DownloadAction.Type.JSON)){
                                     message.what = Downloader.GOT_JSON;
+                                    //add to cache
+                                    localCache.putValueToCache(request.getUrl(),
+                                            ((DownloadAction.JsonDownloadAction)action).getJsonElement());
                                 }else if (action.getType().equals(DownloadAction.Type.STRING)){
                                     message.what = Downloader.GOT_STRING;
                                 }else{
@@ -125,7 +137,38 @@ public class DownloadManager {
     }
 
 
-    public void submitAndEnqueue(Request request){
+    public void submit(Request request){
+        Log.d(TAG, "submit() called with: request = [" + request + "]");
+        //check if result is already in the cache
+        Object cacheValue = localCache.getValueFromCache(request.getUrl());
+        if (cacheValue != null){
+            Log.d(TAG, "submit: got key in cache");
+            if (cacheValue instanceof Bitmap){
+                Message message = Downloader.MAIN_HANDLER.obtainMessage();
+                message.what = Downloader.GOT_IMAGE;
+                Downloader.DownloaderMessage downloaderMessage = new Downloader
+                        .DownloaderMessage(request,
+                        new DownloadAction.ImageDownloadAction(request.getUrl(), (Bitmap) cacheValue));
+                message.obj = downloaderMessage;
+                Downloader.MAIN_HANDLER.sendMessage(message);
+            }else if (cacheValue instanceof JsonElement){
+                Message message = Downloader.MAIN_HANDLER.obtainMessage();
+                message.what = Downloader.GOT_JSON;
+                Downloader.DownloaderMessage downloaderMessage = new Downloader
+                        .DownloaderMessage(request,
+                        new DownloadAction.JsonDownloadAction(request.getUrl(), (JsonElement) cacheValue));
+                message.obj = downloaderMessage;
+                Downloader.MAIN_HANDLER.sendMessage(message);
+            }else {
+                submitAndEnqueue(request);
+            }
+        }else {
+            submitAndEnqueue(request);
+        }
+    }
+
+    private void submitAndEnqueue(Request request){
+        Log.d(TAG, "submitAndEnqueue() called with: request = [" + request + "]");
         //check if the request is already in process
         if (currentRequests.containsKey(request.getTag())){
             //if tag already exists dont do anything
@@ -137,7 +180,7 @@ public class DownloadManager {
                 request.setFuture(threadPoolExecutorHelper.addTask(fileDownloadTask));
                 synchronized (currentTasks){
                     Log.d(TAG, "submitAndEnqueue: adding task to queue"+request.getUrl());
-                    currentTasks.put(Utils.getMD5Hash(request.getUrl()), fileDownloadTask);
+                    currentTasks.put(request.getUrl(), fileDownloadTask);
                     currentTasks.notifyAll();
                 }
             }else {

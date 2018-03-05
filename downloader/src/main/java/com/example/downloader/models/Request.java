@@ -86,4 +86,12 @@ public final class Request {
 
     }
 
+
+    @Override
+    public String toString() {
+        return "Request{" +
+                "url='" + url + '\'' +
+                ", tag=" + tag +
+                '}';
+    }
 }

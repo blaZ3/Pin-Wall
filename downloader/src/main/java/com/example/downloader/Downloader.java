@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.widget.ImageView;
 
 import com.example.downloader.async.DownloadAction;
+import com.example.downloader.cache.LocalMemoryCache;
 import com.example.downloader.models.Request;
 import com.example.downloader.models.RequestInterface;
 
@@ -18,20 +19,12 @@ import com.example.downloader.models.RequestInterface;
 public class Downloader {
     private static final String TAG = Downloader.class.getSimpleName();
 
-//    public static final Handler HANDLER = new Handler(Looper.getMainLooper()){
-//        @Override
-//        public void handleMessage(Message msg) {
-//            super.handleMessage(msg);
-//        }
-//    };
-
-
     private static Downloader instance;
 
     private DownloadManager downloadManager;
 
     private Downloader(Context context) {
-        downloadManager = new DownloadManager(context);
+        downloadManager = new DownloadManager(LocalMemoryCache.getInstance());
     }
 
     public static Downloader with(Context context){
@@ -61,7 +54,7 @@ public class Downloader {
 
 
     public void submit(Request request) {
-        downloadManager.submitAndEnqueue(request);
+        downloadManager.submit(request);
     }
 
 

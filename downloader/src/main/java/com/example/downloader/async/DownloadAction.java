@@ -35,14 +35,23 @@ public interface DownloadAction {
 
         private String url;
         private String filePath;
+        private Bitmap bitmap;
 
         public ImageDownloadAction(String url, String filePath){
             this.url = url;
             this.filePath = filePath;
         }
 
+        public ImageDownloadAction(String url, Bitmap bitmap){
+            this.url = url;
+            this.bitmap = bitmap;
+            this.filePath = null;
+        }
+
         public Bitmap getBitmap(){
-            Bitmap bitmap = BitmapFactory.decodeFile(filePath);
+            if (bitmap == null && filePath!=null){
+                bitmap = BitmapFactory.decodeFile(filePath);
+            }
             return bitmap;
         }
 
@@ -61,21 +70,31 @@ public interface DownloadAction {
 
         private String url;
         private String filePath;
+        private JsonElement jsonElement;
 
         public JsonDownloadAction(String url, String filePath){
             this.url = url;
             this.filePath = filePath;
         }
 
+        public JsonDownloadAction(String url, JsonElement jsonElement){
+            this.url = url;
+            this.jsonElement = jsonElement;
+            this.filePath = null;
+        }
+
         public JsonElement getJsonElement(){
-            try  {
-                BufferedReader br = new BufferedReader(new FileReader(filePath));
-                JsonParser parser = new JsonParser();
-                JsonElement JsonElement = parser.parse(br);
-                return JsonElement;
-            }catch (Exception ex){
-                return null;
+            if (jsonElement == null && filePath != null){
+                try  {
+                    BufferedReader br = new BufferedReader(new FileReader(filePath));
+                    JsonParser parser = new JsonParser();
+                    jsonElement = parser.parse(br);
+
+                }catch (Exception ex){
+                    jsonElement = null;
+                }
             }
+            return jsonElement;
         }
 
         @Override
