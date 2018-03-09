@@ -3,7 +3,7 @@
 # Pin-Wall
 
 
-A demo app demoing the implementation of custom library that can asyncronously download
+A demo app showing the implementation of custom library that can asyncronously download
 images, JSON, text and other files from the network concurrenlty with mem cache support
 for Images, JSON and text
 
